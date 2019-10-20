@@ -1,6 +1,6 @@
 {
   "name": "mico-store",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "main": "umd/index.js",
   "types": "umd/index.d.ts",
   "private": false,
@@ -15,10 +15,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ymzuiku/nano-store.git"
+    "url": "git+https://github.com/ymzuiku/mico-store.git"
   },
   "bugs": {
-    "url": "git+https://github.com/ymzuiku/nano-store.git"
+    "url": "git+https://github.com/ymzuiku/mico-store.git"
   },
-  "homepage": "git+https://github.com/ymzuiku/nano-store.git"
+  "homepage": "git+https://github.com/ymzuiku/mico-store.git"
 }
