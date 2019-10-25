@@ -3,7 +3,7 @@ function micoStore<T>(state: T) {
     state,
     events: new Set<any>(),
     /** listen Fn in update, memo is Filter listen whith diff state  */
-    listen: (fn: (state: T) => any, memo?: (state: T) => any[]) => {
+    listen: <M>(fn: (state: T, nowMemo: M) => any, memo?: (state: T) => M) => {
       if (memo) {
         (fn as any).getMemo = memo;
         (fn as any).lastMemo = memo(store.state);
@@ -34,6 +34,30 @@ function micoStore<T>(state: T) {
         fn(store.state);
       }
     },
+    connectElement: <M>(element: Element, fn: (state: T, nowMemo: M) => any, memo?: (state: T) => M) => {
+      if (!document || !document.createElement) {
+        return;
+      }
+      if (!element.id) {
+        element.id =
+          Date.now().toString(32) +
+          Math.random()
+            .toString(32)
+            .slice(2);
+      }
+
+      const id = element.id;
+      (element as any).__micoStoreId = id;
+
+      const unListenEle = store.listen((state, nowMemo) => {
+        const el = document.getElementById(id);
+        if (el) {
+          (el as any).__micoStoreEvent(state, nowMemo);
+        } else {
+          unListenEle();
+        }
+      }, memo);
+    },
     update: (fn?: (state: T) => any) => {
       store.beforeUpdate(fn);
       store.events.forEach(fn => {
@@ -48,10 +72,10 @@ function micoStore<T>(state: T) {
             }
           }
           if (isNeedUpdate) {
-            fn(store.state);
+            fn(store.state, fn.lastMemo);
           }
         } else {
-          fn(store.state);
+          fn(store.state, fn.lastMemo);
         }
       });
     },
