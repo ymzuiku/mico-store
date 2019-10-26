@@ -14,18 +14,18 @@ $ npm install --save vanilla-observer
 ## Use
 
 ```js
-import micoStore from 'vanilla-observer';
+import vanillaObserver from 'vanilla-observer';
 
-const store = micoStore({
+const obs = vanillaObserver({
   name: 'dog',
   age: 5,
 });
 
-const unListen = store.listen(state => {
+const unListen = obs.listen(state => {
   console.log(state); // {name:'cat', age: 5}
 });
 
-store.setState({
+obs.setState({
   name: 'cat',
 });
 ```
