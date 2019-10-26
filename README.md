@@ -1,4 +1,4 @@
-# nano-store
+# vanilla-observer
 
 | type   | size |
 | ------ | ---- |
@@ -8,13 +8,13 @@
 ## Install
 
 ```sh
-$ npm install --save mico-store
+$ npm install --save vanilla-observer
 ```
 
 ## Use
 
 ```js
-import micoStore from 'mico-store';
+import micoStore from 'vanilla-observer';
 
 const store = micoStore({
   name: 'dog',

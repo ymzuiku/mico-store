@@ -1,6 +1,6 @@
 {
-  "name": "mico-store",
-  "version": "1.0.2",
+  "name": "vanilla-observer",
+  "version": "0.1.0",
   "main": "umd/index.js",
   "types": "umd/index.d.ts",
   "private": false,
@@ -15,10 +15,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ymzuiku/mico-store.git"
+    "url": "git+https://github.com/ymzuiku/vanilla-observer.git"
   },
   "bugs": {
-    "url": "git+https://github.com/ymzuiku/mico-store.git"
+    "url": "git+https://github.com/ymzuiku/vanilla-observer.git"
   },
-  "homepage": "git+https://github.com/ymzuiku/mico-store.git"
+  "homepage": "git+https://github.com/ymzuiku/vanilla-observer.git"
 }
