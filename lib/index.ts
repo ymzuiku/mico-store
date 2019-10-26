@@ -34,7 +34,12 @@ function micoStore<T>(state: T) {
         fn(store.state);
       }
     },
-    connectElement: <M>(element: Element, fn: (state: T, nowMemo: M) => any, memo?: (state: T) => M) => {
+    connectElement: <M>(
+      element: Element,
+      fn: (state: T, nowMemo: M) => any,
+      memo?: (state: T) => M,
+      autoRun = true,
+    ) => {
       if (!document || !document.createElement) {
         return;
       }
@@ -46,17 +51,28 @@ function micoStore<T>(state: T) {
             .slice(2);
       }
 
-      const id = element.id;
-      (element as any).__micoStoreId = id;
-
       const unListenEle = store.listen((state, nowMemo) => {
-        const el = document.getElementById(id);
-        if (el) {
-          (el as any).__micoStoreEvent(state, nowMemo);
+        const isHave = document.body.contains(element);
+
+        if (isHave) {
+          fn(state, nowMemo);
         } else {
           unListenEle();
         }
       }, memo);
+
+      // const unListenEle = store.listen((state, nowMemo) => {
+      //   const el = document.getElementById(id);
+      //   if (el && (el as any).__micoStoreEvent) {
+      //     (el as any).__micoStoreEvent(state, nowMemo);
+      //   } else {
+      //     unListenEle();
+      //   }
+      // }, memo);
+
+      if (autoRun) {
+        fn(store.state, (memo ? memo(store.state) : []) as any);
+      }
     },
     update: (fn?: (state: T) => any) => {
       store.beforeUpdate(fn);

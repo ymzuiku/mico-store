@@ -7,7 +7,7 @@ declare function micoStore<T>(state: T): {
     setState: (payload: any) => void;
     /** You can replace this Function, example add immer in this */
     beforeUpdate: (fn: any) => void;
-    connectElement: <M>(element: Element, fn: (state: T, nowMemo: M) => any, memo?: ((state: T) => M) | undefined) => void;
+    connectElement: <M>(element: Element, fn: (state: T, nowMemo: M) => any, memo?: ((state: T) => M) | undefined, autoRun?: boolean) => void;
     update: (fn?: ((state: T) => any) | undefined) => void;
 };
 export default micoStore;
