@@ -16,20 +16,24 @@ $ npm install --save vanilla-observer
 ```js
 import vanillaObserver from 'vanilla-observer';
 
-const obs = vanillaObserver({
+const obser = vanillaObserver({
   name: 'dog',
   age: 5,
 });
 
 // listen s.name on change
-const unListen = obs.listen(
+const unListen = obser.listen(
   s => [s.name],
   name => {
     console.log(name); // 'cat'
   },
 );
 
-obs.update(s => {
+obser.update(s => {
   s.name = 'cat';
 });
+
+// listen and connect Element, if Element remove int document, auto unListe function
+const element = document.getElementById('theElement');
+obser.listenElement(element, s => [s.name], name => console.log(name));
 ```

@@ -2,9 +2,11 @@ import $ from 'vanilly';
 import vanillaObserver from 'vanilla-observer';
 
 const obser = vanillaObserver({
-  list: Array(500).fill(0) as number[],
+  list: Array(2000).fill(0) as number[],
   name: 'hello',
 });
+
+(window as any).obser = obser;
 
 const App = () => {
   return $('div').$append(
@@ -17,11 +19,14 @@ const App = () => {
         });
       });
 
-      obser.connectElement(
+      obser.listenElement(
         item,
         s => [s.list[i], s.list],
         (i, list) => {
           item.$text(i);
+          if (i > 1) {
+            item.remove();
+          }
         },
       );
 
@@ -30,4 +35,8 @@ const App = () => {
   );
 };
 
+console.time('render');
 document.body.append(App());
+setTimeout(() => {
+  console.timeEnd('render');
+});

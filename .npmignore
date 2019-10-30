@@ -3,6 +3,7 @@
 **/app/uploads/*
 # dependencies
 **/node_modules
+**/example
 **/.pnp
 **/.pnp.js
 **/server/tmp

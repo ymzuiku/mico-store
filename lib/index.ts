@@ -1,3 +1,66 @@
+export type IListen<T> = <
+  M extends
+    | []
+    | [any]
+    | [any, any]
+    | [any, any, any]
+    | [any, any, any, any]
+    | [any, any, any, any, any]
+    | [any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any]
+>(
+  memo: (state: T) => M,
+  fn: (...nowMemo: M) => any,
+  autoRun?: boolean,
+) => any;
+
+export type IListenElement<T> = <
+  M extends
+    | []
+    | [any]
+    | [any, any]
+    | [any, any, any]
+    | [any, any, any, any]
+    | [any, any, any, any, any]
+    | [any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any, any, any, any]
+    | [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any]
+>(
+  element: Element,
+  memo: (state: T) => M,
+  fn: (...nowMemo: M) => any,
+  autoRun?: boolean,
+) => any;
+
+export interface IObserver<T> {
+  // listenElementRecheckNumber
+  __lern: number;
+  // listenElementRecheckNumber length
+  __lern_length: number;
+  state: T;
+  events: Set<any>;
+  listen: IListen<T>;
+  listenElement: IListenElement<T>;
+  unListen: (fn: any) => any;
+  beforeUpdate: (fn: any) => any;
+  update: (fn?: (state: T) => any) => any;
+}
+
 const timeOutRun = (isDelay: boolean, fn: any) => {
   if (!isDelay) {
     fn();
@@ -13,32 +76,14 @@ const timeOutRun = (isDelay: boolean, fn: any) => {
 };
 
 function vanillaObserver<T>(state: T, isDelay = true) {
-  const observer = {
+  const isBrower = document && document.createElement;
+  const observer: IObserver<T> = {
+    __lern: 0,
+    __lern_length: 20,
     state,
     events: new Set<any>(),
     /** listen Fn in update, memo is Filter listen whith diff state  */
-    listen: <
-      M extends
-        | []
-        | [any]
-        | [any, any]
-        | [any, any, any]
-        | [any, any, any, any]
-        | [any, any, any, any, any]
-        | [any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any]
-    >(
-      memo: (state: T) => M,
-      fn: (...nowMemo: M) => any,
-    ) => {
+    listen: (memo, fn) => {
       (fn as any).getMemo = memo;
       (fn as any).lastMemo = memo(observer.state);
 
@@ -47,72 +92,46 @@ function vanillaObserver<T>(state: T, isDelay = true) {
       }
 
       return () => {
-        observer.events.delete(fn);
+        observer.unListen(fn);
       };
     },
-    unListen: (fn: any) => {
-      observer.events.delete(fn);
-    },
-    // setState: (payload: any) => {
-    //   observer.state = {
-    //     ...observer.state,
-    //     ...payload,
-    //   };
-
-    //   observer.update();
-    // },
-    /** You can replace this Function, example add immer in this */
-    beforeUpdate: (fn: any) => {
-      if (fn) {
-        fn(observer.state);
-      }
-    },
-    connectElement: <
-      M extends
-        | []
-        | [any]
-        | [any, any]
-        | [any, any, any]
-        | [any, any, any, any]
-        | [any, any, any, any, any]
-        | [any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any, any, any, any]
-        | [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any]
-    >(
-      element: Element,
-      memo: (state: T) => M,
-      fn: (...nowMemo: M) => any,
-      autoRun = true,
-    ) => {
-      if (!document || !document.createElement) {
+    listenElement: (element, memo, fn, autoRun = true) => {
+      if (!isBrower) {
         return;
       }
 
-      const unListenEle = observer.listen(memo, (...nowMemo: M) => {
-        const isHave = document.body.contains(element);
+      const listenFn = (...nowMemo: any) => {
+        const isHave = document.body.contains(listenFn.element);
 
         if (isHave) {
           fn(...nowMemo);
         } else {
           unListenEle();
         }
-      });
+      };
+      listenFn.element = element;
+
+      const unListenEle = observer.listen(memo, listenFn);
 
       if (autoRun) {
         fn(...memo(observer.state));
       }
     },
-
+    unListen: (fn: any) => {
+      fn.element = null;
+      fn.getMemo = null;
+      fn.lastMemo = null;
+      observer.events.delete(fn);
+    },
+    beforeUpdate: (fn: any) => {
+      if (fn) {
+        fn(observer.state);
+      }
+    },
     update: (fn?: (state: T) => any) => {
       observer.beforeUpdate(fn);
       timeOutRun(isDelay, () => {
+        observer.__lern += 1;
         observer.events.forEach(fn => {
           if (fn.getMemo && fn.lastMemo) {
             const nowMemo = fn.getMemo(observer.state);
@@ -131,14 +150,19 @@ function vanillaObserver<T>(state: T, isDelay = true) {
           } else {
             fn(...fn.lastMemo);
           }
+
+          // 定时检查没有被清空的元素捆绑
+          if (fn.element && observer.__lern > observer.__lern_length) {
+            observer.__lern = 0;
+            const isHave = document.body.contains(fn.element);
+            if (!isHave) {
+              observer.unListen(fn);
+            }
+          }
         });
       });
     },
   };
-
-  if (!document || !document.createElement) {
-    observer.connectElement = null as any;
-  }
 
   return observer;
 }
