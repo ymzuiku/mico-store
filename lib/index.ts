@@ -43,13 +43,6 @@ function vanillaObserver<T>(state: T) {
       if (!document || !document.createElement) {
         return;
       }
-      if (!element.id) {
-        element.id =
-          Date.now().toString(32) +
-          Math.random()
-            .toString(32)
-            .slice(2);
-      }
 
       const unListenEle = observer.listen((state, nowMemo) => {
         const isHave = document.body.contains(element);
