@@ -21,11 +21,15 @@ const obs = vanillaObserver({
   age: 5,
 });
 
-const unListen = obs.listen(state => {
-  console.log(state); // {name:'cat', age: 5}
-});
+// listen s.name on change
+const unListen = obs.listen(
+  s => [s.name],
+  name => {
+    console.log(name); // 'cat'
+  },
+);
 
-obs.setState({
-  name: 'cat',
+obs.update(s => {
+  s.name = 'cat';
 });
 ```
