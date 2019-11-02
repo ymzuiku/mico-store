@@ -4,7 +4,7 @@
 # dependencies
 **/node_modules
 **/example
-example
+example/node_modules
 **/.pnp
 **/.pnp.js
 **/server/tmp
