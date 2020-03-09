@@ -7,9 +7,18 @@
 
 ## Install
 
+unpkg, use last version:
+
+```html
+<script src="https://unpkg.com/vanilla-observer@1.0.0/umd/index.js"></script>
+```
+
+npm:
+
 ```sh
 $ npm install --save vanilla-observer
 ```
+
 ## Use reactive at base HTMLElement:
 
 ```js

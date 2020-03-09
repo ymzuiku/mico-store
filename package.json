@@ -1,6 +1,6 @@
 {
   "name": "vanilla-observer",
-  "version": "0.2.3",
+  "version": "1.0.0",
   "main": "umd/index.js",
   "types": "umd/index.d.ts",
   "private": false,
