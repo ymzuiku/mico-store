@@ -10,8 +10,34 @@
 ```sh
 $ npm install --save vanilla-observer
 ```
+## Use reactive at base HTMLElement:
 
-## Use
+```js
+import vanillaObserver from 'vanilla-observer';
+
+const obser = vanillaObserver({
+  name: 'dog',
+  age: 5,
+});
+
+// listen and connect Element
+const element = document.getElementById('theElement');
+
+// If obser's name is update, change the element
+// If Element remove int document, auto unListe function
+obser.listenElement(element, s => [s.name], name => element.textContent = name);
+
+// change obser's name
+const input = document.getElementById('theInput');
+input.oninput = (event)=>{
+  obser.update(s=>{
+    s.name = event.target.value;
+  })
+};
+```
+
+
+## Use Observer at everywhere:
 
 ```js
 import vanillaObserver from 'vanilla-observer';
@@ -33,7 +59,7 @@ obser.update(s => {
   s.name = 'cat';
 });
 
-// listen and connect Element, if Element remove int document, auto unListe function
-const element = document.getElementById('theElement');
-obser.listenElement(element, s => [s.name], name => console.log(name));
+// after destory
+unListen();
 ```
+
