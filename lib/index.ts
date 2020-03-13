@@ -15,11 +15,27 @@ export type IListen<T> = <
     | [any, any, any, any, any, any, any, any, any, any, any, any]
     | [any, any, any, any, any, any, any, any, any, any, any, any, any]
     | [any, any, any, any, any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any]
+    | [
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any
+      ]
 >(
   memo: (state: T) => M,
   fn: (...nowMemo: M) => any,
-  autoRun?: boolean,
+  autoRun?: boolean
 ) => any;
 
 export type IListenElement<T> = <
@@ -39,12 +55,28 @@ export type IListenElement<T> = <
     | [any, any, any, any, any, any, any, any, any, any, any, any]
     | [any, any, any, any, any, any, any, any, any, any, any, any, any]
     | [any, any, any, any, any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any]
+    | [
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any
+      ]
 >(
   element: Element,
   memo: (state: T) => M,
   fn: (...nowMemo: M) => any,
-  autoRun?: boolean,
+  autoRun?: boolean
 ) => any;
 
 export interface IObserver<T> {
@@ -74,6 +106,73 @@ const timeOutRun = (isDelay: boolean, fn: any) => {
     }
   }
 };
+
+export function timeoutInterval(space: number, timeout: number, fn: Function) {
+  let time = 0;
+  let timer = setInterval(() => {
+    time += 30;
+    if (time > timeout && timer !== null) {
+      clearInterval(timer);
+      timer = null as any;
+      return;
+    }
+    fn();
+  }, space);
+
+  return timer;
+}
+
+/**
+ * Slowy, use setInterval, spaceTime is 30ms, timeout is 3500ms
+ * @param ele 
+ * @param fn 
+ * @param space 
+ * @param timeout 
+ */
+export function waitElementRendered(
+  ele: HTMLElement,
+  space = 30,
+  timeout = 3500
+) {
+  return new Promise((res, rej)=>{
+    let timer = timeoutInterval(space, timeout, () => {
+      const isHave = document.body.contains(ele);
+      if (isHave && timer !== null) {
+        res();
+        clearInterval(timer);
+        timer = null as any;
+      } else {
+        rej()
+      }
+    });
+  })
+}
+
+/**
+ * Slowy, use setInterval, spaceTime is 350ms, timeout is 900000ms
+ * @param ele 
+ * @param fn 
+ * @param space 
+ * @param timeout 
+ */
+export function waitElementRemoved(
+  ele: HTMLElement,
+  space = 350,
+  timeout = 900000
+) {
+  return new Promise((res, rej)=>{
+    let timer = timeoutInterval(space, timeout, () => {
+      const isHave = document.body.contains(ele);
+      if (!isHave && timer !== null) {
+        res();
+        clearInterval(timer);
+        timer = null as any;
+      } else {
+        rej()
+      }
+    });
+  })
+}
 
 function vanillaObserver<T>(state: T, isDelay = true) {
   const isBrower = document && document.createElement;
@@ -161,7 +260,7 @@ function vanillaObserver<T>(state: T, isDelay = true) {
           }
         });
       });
-    },
+    }
   };
 
   return observer;

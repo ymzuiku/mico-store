@@ -72,3 +72,29 @@ obser.update(s => {
 unListen();
 ```
 
+## Other feature
+
+### Wait element rendered
+
+```js
+import {waitElementRendered} from 'vanilla-observer';
+
+const ele = docuement.createElement('div');
+waitElementRendered(ele, ()=>{
+  ele.textContent = 'hello, reset text';
+});
+
+```
+
+### Wait element removed
+
+```js
+import { waitElementRemoved } from 'vanilla-observer';
+
+const ele = docuement.createElement('div');
+waitElementRendered(ele, ()=>{
+  ele.textContent = 'hello, reset text';
+});
+
+```
+
