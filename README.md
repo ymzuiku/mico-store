@@ -88,6 +88,7 @@ waitElementRendered(ele, ()=>{
 
 ### Wait element removed
 
+
 ```js
 import { waitElementRemoved } from 'vanilla-observer';
 
