@@ -1,269 +1,90 @@
-export type IListen<T> = <
-  M extends
-    | []
-    | [any]
-    | [any, any]
-    | [any, any, any]
-    | [any, any, any, any]
-    | [any, any, any, any, any]
-    | [any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any, any, any, any]
-    | [
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      ]
->(
-  memo: (state: T) => M,
-  fn: (...nowMemo: M) => any,
-  autoRun?: boolean
-) => any;
+class Subject<T> {
+  key = 1;
+  eventList = {} as any;
+  next = (state?: T) => {
+    Object.keys(this.eventList).forEach(k=>{
+      const fn= this.eventList[k];
+      fn && fn(state);
+    })
+  };
+  subscribe = (fn: (state: T) => any) => {
+    this.key++;
+    
+    const nowKey = this.key;
+    this.eventList[nowKey] = fn;
+    return {
+      unsubscribe: () => {
+        delete this.eventList[nowKey];
+      },
+    };
+  };
+}
 
-export type IListenElement<T> = <
-  M extends
-    | []
-    | [any]
-    | [any, any]
-    | [any, any, any]
-    | [any, any, any, any]
-    | [any, any, any, any, any]
-    | [any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any, any, any]
-    | [any, any, any, any, any, any, any, any, any, any, any, any, any, any]
-    | [
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      ]
->(
-  element: Element,
-  memo: (state: T) => M,
-  fn: (...nowMemo: M) => any,
-  autoRun?: boolean
-) => any;
-
-export interface IObserver<T> {
-  // listenElementRecheckNumber
-  __lern: number;
-  // listenElementRecheckNumber length
-  __lern_length: number;
+interface IStore<T> extends Subject<T> {
   state: T;
-  events: Set<any>;
-  listen: IListen<T>;
-  listenElement: IListenElement<T>;
-  unListen: (fn: any) => any;
-  beforeUpdate: (fn: any) => any;
-  update: (fn?: (state: T) => any) => any;
+  nextState: (fn: (state: T) => any) => any;
+  subscribeNode: (ele: Node, fn: (state: T) => any) => any;
+  subscribeFilter: <M extends any[]>(
+    filter: (state: T) => M,
+    fn: (...theMemo: M) => any
+  ) => any;
+  subscribeFilterNode: <M extends any[]>(
+    ele: HTMLElement,
+    filter: (state: T) => M,
+    fn: (...theMemo: M) => any
+  ) => any;
 }
 
-const timeOutRun = (isDelay: boolean, fn: any) => {
-  if (!isDelay) {
-    fn();
-  } else {
-    if (window.requestAnimationFrame) {
-      window.requestAnimationFrame(fn);
-    } else {
-      setTimeout(() => {
-        fn();
-      }, 30);
-    }
-  }
-};
+function vanillaObserver<T>(state: T): IStore<T> {
+  const store: IStore<T> = new Subject() as any;
+  store.state = state;
 
-export function timeoutInterval(space: number, timeout: number, fn: Function) {
-  let time = 0;
-  let timer = setInterval(() => {
-    time += 30;
-    if (time > timeout && timer !== null) {
-      clearInterval(timer);
-      timer = null as any;
-      return;
-    }
-    fn();
-  }, space);
-
-  return timer;
-}
-
-/**
- * Slowy, use setInterval, spaceTime is 30ms, timeout is 3500ms
- * @param ele 
- * @param fn 
- * @param space 
- * @param timeout 
- */
-export function waitElementRendered(
-  ele: HTMLElement,
-  space = 30,
-  timeout = 3500
-) {
-  return new Promise((res, rej)=>{
-    let timer = timeoutInterval(space, timeout, () => {
-      const isHave = document.body.contains(ele);
-      if (isHave && timer !== null) {
-        res();
-        clearInterval(timer);
-        timer = null as any;
-      } else {
-        rej()
-      }
-    });
-  })
-}
-
-/**
- * Slowy, use setInterval, spaceTime is 350ms, timeout is 900000ms
- * @param ele 
- * @param fn 
- * @param space 
- * @param timeout 
- */
-export function waitElementRemoved(
-  ele: HTMLElement,
-  space = 350,
-  timeout = 900000
-) {
-  return new Promise((res, rej)=>{
-    let timer = timeoutInterval(space, timeout, () => {
-      const isHave = document.body.contains(ele);
-      if (!isHave && timer !== null) {
-        res();
-        clearInterval(timer);
-        timer = null as any;
-      } else {
-        rej()
-      }
-    });
-  })
-}
-
-function vanillaObserver<T>(state: T, isDelay = true) {
-  const isBrower = document && document.createElement;
-  const observer: IObserver<T> = {
-    __lern: 0,
-    __lern_length: 20,
-    state,
-    events: new Set<any>(),
-    /** listen Fn in update, memo is Filter listen whith diff state  */
-    listen: (memo, fn) => {
-      (fn as any).getMemo = memo;
-      (fn as any).lastMemo = memo(observer.state);
-
-      if (!observer.events.has(fn)) {
-        observer.events.add(fn);
-      }
-
-      return () => {
-        observer.unListen(fn);
-      };
-    },
-    listenElement: (element, memo, fn, autoRun = true) => {
-      if (!isBrower) {
-        return;
-      }
-
-      const listenFn = (...nowMemo: any) => {
-        const isHave = document.body.contains(listenFn.element);
-
-        if (isHave) {
-          fn(...nowMemo);
-        } else {
-          unListenEle();
-        }
-      };
-      listenFn.element = element;
-
-      const unListenEle = observer.listen(memo, listenFn);
-
-      if (autoRun) {
-        fn(...memo(observer.state));
-      }
-    },
-    unListen: (fn: any) => {
-      fn.element = null;
-      fn.getMemo = null;
-      fn.lastMemo = null;
-      observer.events.delete(fn);
-    },
-    beforeUpdate: (fn: any) => {
-      if (fn) {
-        fn(observer.state);
-      }
-    },
-    update: (fn?: (state: T) => any) => {
-      observer.beforeUpdate(fn);
-      timeOutRun(isDelay, () => {
-        observer.__lern += 1;
-        observer.events.forEach(fn => {
-          if (fn.getMemo && fn.lastMemo) {
-            const nowMemo = fn.getMemo(observer.state);
-            let isNeedUpdate = false;
-            for (let i = 0; i < fn.lastMemo.length; i++) {
-              const v = fn.lastMemo[i];
-              if (v !== nowMemo[i]) {
-                isNeedUpdate = true;
-                break;
-              }
-            }
-            fn.lastMemo = nowMemo;
-            if (isNeedUpdate) {
-              fn(...fn.lastMemo);
-            }
-          } else {
-            fn(...fn.lastMemo);
-          }
-
-          // 定时检查没有被清空的元素捆绑
-          if (fn.element && observer.__lern > observer.__lern_length) {
-            observer.__lern = 0;
-            const isHave = document.body.contains(fn.element);
-            if (!isHave) {
-              observer.unListen(fn);
-            }
-          }
-        });
-      });
-    }
+  store.nextState = (fn: (state: T) => any) => {
+    fn(state);
+    store.next(state);
   };
 
-  return observer;
+  store.subscribeNode = (ele, fn) => {
+    const sub = store.subscribe(state => {
+      if (!document.contains(ele)) {
+        sub.unsubscribe();
+        return;
+      }
+      fn(state);
+    });
+  };
+
+  store.subscribeFilter = (filter, fn) => {
+    let last = filter(state);
+    const len = last.length;
+    return store.subscribe(state => {
+      const current = filter(state);
+      let isJump = false;
+      for (let i = 0; i < len; i++) {
+        if (current[i] !== last[i]) {
+          isJump = true;
+          break;
+        }
+      }
+      if (isJump) {
+        return;
+      }
+      fn(...current);
+      last = current;
+    });
+  };
+
+  store.subscribeFilterNode = (ele, filter: any, fn) => {
+    const sub = store.subscribeFilter(filter, (...props: any) => {
+      if (!document.contains(ele)) {
+        sub.unsubscribe();
+        return;
+      }
+      fn(...props);
+    });
+  };
+
+  return store;
 }
 
 export default vanillaObserver;

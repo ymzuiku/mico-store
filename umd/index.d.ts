@@ -1,32 +1,17 @@
-export declare type IListen<T> = <M extends [] | [any] | [any, any] | [any, any, any] | [any, any, any, any] | [any, any, any, any, any] | [any, any, any, any, any, any] | [any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any]>(memo: (state: T) => M, fn: (...nowMemo: M) => any, autoRun?: boolean) => any;
-export declare type IListenElement<T> = <M extends [] | [any] | [any, any] | [any, any, any] | [any, any, any, any] | [any, any, any, any, any] | [any, any, any, any, any, any] | [any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any, any, any, any] | [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any]>(element: Element, memo: (state: T) => M, fn: (...nowMemo: M) => any, autoRun?: boolean) => any;
-export interface IObserver<T> {
-    __lern: number;
-    __lern_length: number;
-    state: T;
-    events: Set<any>;
-    listen: IListen<T>;
-    listenElement: IListenElement<T>;
-    unListen: (fn: any) => any;
-    beforeUpdate: (fn: any) => any;
-    update: (fn?: (state: T) => any) => any;
+declare class Subject<T> {
+    key: number;
+    eventList: any;
+    next: (state?: T | undefined) => void;
+    subscribe: (fn: (state: T) => any) => {
+        unsubscribe: () => void;
+    };
 }
-export declare function timeoutInterval(space: number, timeout: number, fn: Function): number;
-/**
- * Slowy, use setInterval, spaceTime is 30ms, timeout is 3500ms
- * @param ele
- * @param fn
- * @param space
- * @param timeout
- */
-export declare function waitElementRendered(ele: HTMLElement, space?: number, timeout?: number): Promise<unknown>;
-/**
- * Slowy, use setInterval, spaceTime is 350ms, timeout is 900000ms
- * @param ele
- * @param fn
- * @param space
- * @param timeout
- */
-export declare function waitElementRemoved(ele: HTMLElement, space?: number, timeout?: number): Promise<unknown>;
-declare function vanillaObserver<T>(state: T, isDelay?: boolean): IObserver<T>;
+interface IStore<T> extends Subject<T> {
+    state: T;
+    nextState: (fn: (state: T) => any) => any;
+    subscribeNode: (ele: Node, fn: (state: T) => any) => any;
+    subscribeFilter: <M extends any[]>(filter: (state: T) => M, fn: (...theMemo: M) => any) => any;
+    subscribeFilterNode: <M extends any[]>(ele: HTMLElement, filter: (state: T) => M, fn: (...theMemo: M) => any) => any;
+}
+declare function vanillaObserver<T>(state: T): IStore<T>;
 export default vanillaObserver;
