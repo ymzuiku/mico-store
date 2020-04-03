@@ -1,5 +1,4 @@
 declare class Subject<T> {
-    key: number;
     eventList: any;
     next: (state?: T | undefined) => void;
     subscribe: (fn: (state: T) => any) => {

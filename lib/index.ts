@@ -1,5 +1,4 @@
 class Subject<T> {
-  key = 1;
   eventList = {} as any;
   next = (state?: T) => {
     Object.keys(this.eventList).forEach(k=>{
@@ -8,9 +7,7 @@ class Subject<T> {
     })
   };
   subscribe = (fn: (state: T) => any) => {
-    this.key++;
-    
-    const nowKey = this.key;
+    const nowKey = Date.now()+Math.random();
     this.eventList[nowKey] = fn;
     return {
       unsubscribe: () => {
