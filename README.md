@@ -56,11 +56,11 @@ const obser = vanillaObserver({
   age: 5,
 });
 
-// listen s.name on change
+// Only listen s.name on change
 const sub = obser.subscribeFilter(
   s => [s.name],
-  name => {
-    console.log(name); // 'cat'
+  (s) => {
+    console.log(s.name); // 'cat'
   },
 );
 

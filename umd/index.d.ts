@@ -5,12 +5,13 @@ declare class Subject<T> {
         unsubscribe: () => void;
     };
 }
-interface IStore<T> extends Subject<T> {
+interface IStore<T, A> extends Subject<T> {
+    actions: A;
     state: T;
-    nextState: (fn: (state: T) => any) => any;
-    subscribeNode: (ele: Node, fn: (state: T) => any) => any;
-    subscribeFilter: <M extends any[]>(filter: (state: T) => M, fn: (...theMemo: M) => any) => any;
-    subscribeFilterNode: <M extends any[]>(ele: HTMLElement, filter: (state: T) => M, fn: (...theMemo: M) => any) => any;
+    nextState: (fn?: (state: T) => any) => any;
+    subscribeTarget: (ele: Node, fn: (state: T) => any, dispose?: (state: T) => any) => any;
+    subscribeFilter: (filter: (state: T) => any[], fn: (state: T) => any) => any;
+    subscribeFilterTarget: (ele: Node, filter: (state: T) => any[], fn: (state: T) => any, dispose?: (state: T) => any) => any;
 }
-declare function vanillaObserver<T>(state: T): IStore<T>;
+declare function vanillaObserver<T, A>(state: T, actions?: A): IStore<T, A>;
 export default vanillaObserver;

@@ -1,13 +1,13 @@
 class Subject<T> {
   eventList = {} as any;
   next = (state?: T) => {
-    Object.keys(this.eventList).forEach(k=>{
-      const fn= this.eventList[k];
+    Object.keys(this.eventList).forEach((k) => {
+      const fn = this.eventList[k];
       fn && fn(state);
-    })
+    });
   };
   subscribe = (fn: (state: T) => any) => {
-    const nowKey = Date.now()+Math.random();
+    const nowKey = Date.now() + Math.random();
     this.eventList[nowKey] = fn;
     return {
       unsubscribe: () => {
@@ -17,34 +17,39 @@ class Subject<T> {
   };
 }
 
-interface IStore<T> extends Subject<T> {
+interface IStore<T, A> extends Subject<T> {
+  actions: A;
   state: T;
-  nextState: (fn: (state: T) => any) => any;
-  subscribeNode: (ele: Node, fn: (state: T) => any) => any;
-  subscribeFilter: <M extends any[]>(
-    filter: (state: T) => M,
-    fn: (...theMemo: M) => any
+  nextState: (fn?: (state: T) => any) => any;
+  subscribeTarget: (
+    ele: Node,
+    fn: (state: T) => any,
+    dispose?: (state: T) => any
   ) => any;
-  subscribeFilterNode: <M extends any[]>(
-    ele: HTMLElement,
-    filter: (state: T) => M,
-    fn: (...theMemo: M) => any
+  subscribeFilter: (filter: (state: T) => any[], fn: (state: T) => any) => any;
+  subscribeFilterTarget: (
+    ele: Node,
+    filter: (state: T) => any[],
+    fn: (state: T) => any,
+    dispose?: (state: T) => any
   ) => any;
 }
 
-function vanillaObserver<T>(state: T): IStore<T> {
-  const store: IStore<T> = new Subject() as any;
+function vanillaObserver<T, A>(state: T, actions?: A): IStore<T, A> {
+  const store: IStore<T, A> = new Subject() as any;
   store.state = state;
+  store.actions = actions || ({} as any);
 
-  store.nextState = (fn: (state: T) => any) => {
-    fn(state);
+  store.nextState = (fn?: (state: T) => any) => {
+    fn && fn(state);
     store.next(state);
   };
 
-  store.subscribeNode = (ele, fn) => {
-    const sub = store.subscribe(state => {
+  store.subscribeTarget = (ele, fn, dispose) => {
+    const sub = store.subscribe((state) => {
       if (!document.contains(ele)) {
         sub.unsubscribe();
+        dispose && dispose(state);
         return;
       }
       fn(state);
@@ -54,30 +59,31 @@ function vanillaObserver<T>(state: T): IStore<T> {
   store.subscribeFilter = (filter, fn) => {
     let last = filter(state);
     const len = last.length;
-    return store.subscribe(state => {
-      const current = filter(state);
-      let isJump = false;
+    return store.subscribe((theState) => {
+      const current = filter(theState);
+      let isKeep = true;
       for (let i = 0; i < len; i++) {
         if (current[i] !== last[i]) {
-          isJump = true;
+          isKeep = false;
           break;
         }
       }
-      if (isJump) {
+      if (isKeep) {
         return;
       }
-      fn(...current);
+      fn(theState);
       last = current;
     });
   };
 
-  store.subscribeFilterNode = (ele, filter: any, fn) => {
-    const sub = store.subscribeFilter(filter, (...props: any) => {
+  store.subscribeFilterTarget = (ele, filter: any, fn, dispose) => {
+    const sub = store.subscribeFilter(filter, (theState) => {
       if (!document.contains(ele)) {
         sub.unsubscribe();
+        dispose && dispose(theState);
         return;
       }
-      fn(...props);
+      fn(theState);
     });
   };
 
